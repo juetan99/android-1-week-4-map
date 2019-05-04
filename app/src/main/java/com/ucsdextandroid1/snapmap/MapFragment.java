@@ -5,9 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,20 +79,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false  ));
 
-        UserLocationsAdapter adapter = new UserLocationsAdapter();
+        adapter = new UserLocationsAdapter();
 
         recyclerView.setAdapter(adapter);
 
-        DataSources.getInstance().getStaticUserLocations(new DataSources.Callback<List<UserLocationData>>() {
+        DataSources.getInstance().getActiveUserLocation(new DataSources.Callback<List<UserLocationData>>() {
             @Override
             public void onDataFetched(List<UserLocationData> data) {
                 adapter.setItems(data);
             }
         });
 
+        updateAdapter();
+        updateUserLocation();
+
         return root;
     }
 
+    private void updateAdapter(){
+        DataSources.getInstance().getActiveUserLocation(new DataSources.Callback<List<UserLocationData>>() {
+            @Override
+            public void onDataFetched(List<UserLocationData> data) {
+                adapter.setItems(data);
+            }
+        });
+    }
+
+    private void updateUserLocation(){
+        String userId = "user_01";
+
+        UserLocationData locationData = new UserLocationData(
+                "#911542",42.31,-71.11, "Boston, MA", userId, "Joy");
+
+        DataSources.getInstance().updateUser(userId, locationData, new DataSources.Callback<UserLocationData>() {
+            @Override
+            public void onDataFetched(UserLocationData data) {
+                Toast.makeText(getContext(), data != null ? "Success" : "failure", Toast.LENGTH_SHORT).show();
+
+                if (data != null)
+                    updateAdapter();
+            }
+        });
+
+
+    }
 
     public void OnMapReady(GoogleMap googleMap){
         MarkerOptions markerOptions = new MarkerOptions();
