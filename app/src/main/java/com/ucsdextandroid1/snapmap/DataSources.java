@@ -36,7 +36,7 @@ public class DataSources {
 
     public DataSources() {
 
-        Gson gson= new GsonBuilder().registerTypeAdapter(ActiveUserLocationResponse.class, new ActiveUserLocationResonseDeserializer())
+        Gson gson= new GsonBuilder().registerTypeAdapter(ActiveUserLocationResponse.class, new ActiveUserLocationResponseDeserializer())
                 .addSerializationExclusionStrategy(new ExclusionStrategy() {
                     @Override
                     public boolean shouldSkipField(FieldAttributes f) {
